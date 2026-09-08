@@ -136,7 +136,7 @@
   <footer>8 lecciones · de print() a funciones</footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.4/pyodide.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script>
 const LESSONS = [
   {
@@ -382,12 +382,18 @@ json.dumps({'output': buf.getvalue(), 'error': __error__})
 }
 
 async function setup(){
-  pyodide = await loadPyodide({ indexURL: "https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.4/" });
-  runBtn.disabled = false;
-  runBtn.textContent = 'Ejecutar mi ejercicio';
-  exampleRunBtn.disabled = false;
-  exampleRunBtn.textContent = 'Ejecutar ejemplo';
-  loadLesson(0);
+  try {
+    pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
+    runBtn.disabled = false;
+    runBtn.textContent = 'Ejecutar mi ejercicio';
+    exampleRunBtn.disabled = false;
+    exampleRunBtn.textContent = 'Ejecutar ejemplo';
+    loadLesson(0);
+  } catch (e) {
+    runBtn.textContent = 'Error al cargar Python';
+    exampleRunBtn.textContent = 'Error al cargar Python';
+    exampleConsoleEl.textContent = 'No se pudo cargar Python. Revisa tu conexión a internet y recarga la página. Detalle: ' + e;
+  }
 }
 
 exampleRunBtn.onclick = async () => {

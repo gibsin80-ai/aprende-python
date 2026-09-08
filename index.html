@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Aprende Python</title>
+<style>
+  :root{
+    --bg:#12151A;
+    --panel:#1B1F26;
+    --panel-2:#232833;
+    --border:#2E3440;
+    --accent:#E8A33D;
+    --accent-dim:#8a651f;
+    --good:#6FCF97;
+    --bad:#E8735C;
+    --text:#ECEEF1;
+    --muted:#8891A0;
+    --code-bg:#0D0F13;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  body{min-height:100vh;display:flex;justify-content:center;}
+  .app{width:100%;max-width:560px;display:flex;flex-direction:column;min-height:100vh;}
+  header{
+    padding:18px 16px 14px;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:5;
+  }
+  header h1{margin:0;font-size:1.25rem;font-weight:700;letter-spacing:-0.01em;}
+  header h1 span{color:var(--accent);}
+  header p{margin:4px 0 12px;color:var(--muted);font-size:0.85rem;}
+  .stepper{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+  .stepper::-webkit-scrollbar{display:none;}
+  .step{
+    flex:0 0 auto;width:34px;height:34px;border-radius:8px;
+    border:1px solid var(--border);background:var(--panel);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:0.85rem;cursor:pointer;
+  }
+  .step.active{border-color:var(--accent);color:var(--accent);background:rgba(232,163,61,0.1);}
+  .step.done{background:rgba(111,207,151,0.12);border-color:var(--good);color:var(--good);}
+  main{flex:1;padding:16px;display:flex;flex-direction:column;gap:16px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .card h2{margin:0 0 8px;font-size:1.05rem;font-weight:700;}
+  .card p{margin:0 0 8px;line-height:1.5;color:#D3D7DC;font-size:0.92rem;}
+  .card p:last-child{margin-bottom:0;}
+  .card code{
+    font-family:var(--mono);background:var(--code-bg);padding:1px 5px;
+    border-radius:4px;font-size:0.85em;color:var(--accent);
+  }
+  .section-label{
+    display:flex;align-items:center;gap:8px;
+    color:var(--muted);font-size:0.75rem;font-weight:700;
+    text-transform:none;margin:2px 0 2px;
+  }
+  .section-label .bar{width:4px;height:14px;border-radius:2px;background:var(--accent);}
+  .section-label.practice .bar{background:var(--good);}
+  textarea{
+    width:100%;min-height:120px;resize:vertical;
+    background:var(--code-bg);color:#E7ECF2;border:1px solid var(--border);
+    border-radius:10px;padding:12px 14px;font-family:var(--mono);
+    font-size:0.9rem;line-height:1.5;tab-size:4;
+  }
+  textarea.practice-editor{min-height:150px;}
+  textarea:focus{outline:none;border-color:var(--accent-dim);}
+  .row{display:flex;gap:10px;}
+  button{
+    font-family:var(--sans);font-weight:600;font-size:0.87rem;
+    border-radius:9px;border:1px solid var(--border);
+    background:var(--panel-2);color:var(--text);padding:10px 14px;cursor:pointer;
+  }
+  button.primary{background:var(--accent);color:#1a1305;border-color:var(--accent);flex:1;}
+  button.example-run{background:var(--panel-2);border-color:var(--accent-dim);color:var(--accent);flex:1;}
+  button:disabled{opacity:0.5;cursor:default;}
+  button:active{transform:scale(0.98);}
+  .console{
+    background:var(--code-bg);border:1px solid var(--border);border-radius:10px;
+    padding:11px 14px;font-family:var(--mono);font-size:0.83rem;
+    white-space:pre-wrap;word-break:break-word;color:var(--muted);min-height:20px;
+  }
+  .feedback{border-radius:10px;padding:12px 14px;font-size:0.9rem;line-height:1.4;border:1px solid var(--border);}
+  .feedback.pass{background:rgba(111,207,151,0.1);border-color:var(--good);color:var(--good);}
+  .feedback.fail{background:rgba(232,115,92,0.1);border-color:var(--bad);color:var(--bad);}
+  .next-wrap{display:flex;justify-content:flex-end;}
+  .next-wrap button{background:var(--good);color:#0c2016;border-color:var(--good);}
+  .theory-block{
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    padding:14px 16px;display:flex;flex-direction:column;gap:10px;
+  }
+  .practice-block{
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    padding:14px 16px;display:flex;flex-direction:column;gap:10px;
+  }
+  footer{text-align:center;color:var(--muted);font-size:0.75rem;padding:16px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Aprende <span>Python</span></h1>
+    <p id="subtitle">Teoría, ejemplo ejecutable y práctica calificada en cada lección.</p>
+    <div class="stepper" id="stepper"></div>
+  </header>
+  <main>
+    <div class="card" id="lessonCard">
+      <h2 id="lessonTitle"></h2>
+      <div id="lessonBody"></div>
+    </div>
+
+    <div class="theory-block">
+      <div class="section-label"><span class="bar"></span>EJEMPLO — modifícalo y ejecútalo si quieres</div>
+      <textarea id="exampleEditor" spellcheck="false"></textarea>
+      <button class="example-run" id="exampleRunBtn" disabled>Cargando Python…</button>
+      <div class="console" id="exampleConsole">La salida aparecerá aquí.</div>
+    </div>
+
+    <div class="practice-block">
+      <div class="section-label practice"><span class="bar"></span>TU TURNO — resuelve el ejercicio</div>
+      <div id="practiceBody"></div>
+      <textarea id="editor" class="practice-editor" spellcheck="false"></textarea>
+      <div class="row">
+        <button class="primary" id="runBtn" disabled>Cargando Python…</button>
+        <button id="resetBtn">Reiniciar</button>
+      </div>
+      <div class="console" id="consoleOut">La salida de tu código aparecerá aquí.</div>
+      <div id="feedbackWrap"></div>
+      <div class="next-wrap" id="nextWrap"></div>
+    </div>
+  </main>
+  <footer>8 lecciones · de print() a funciones</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.4/pyodide.js"></script>
+<script>
+const LESSONS = [
+  {
+    title: "1. Imprimir en pantalla",
+    body: `
+      <p>Lo primero que aprende todo mundo en Python: <code>print()</code> muestra texto en la pantalla. Es la forma más básica de que tu programa "hable" contigo.</p>
+      <p>Puedes imprimir texto entre comillas, números, o el resultado de una operación. Cada <code>print()</code> nuevo aparece en una línea distinta.</p>
+    `,
+    example: `print("¡Hola, mundo!")\nprint("Python es fácil de leer")\nprint(2 + 2)\n`,
+    practiceBody: `<p>Escribe una línea que imprima el mensaje: <code>Hola, Python</code></p>`,
+    starter: `# Escribe tu código aquí\n`,
+    check: `
+def check(ns, output):
+    o = output.strip().lower()
+    if "hola" in o and "python" in o:
+        return (True, "Perfecto. print() muestra cualquier texto que le pases entre paréntesis.")
+    return (False, "Usa print() para mostrar el texto: Hola, Python")
+`
+  },
+  {
+    title: "2. Variables y tipos de datos",
+    body: `
+      <p>Una variable guarda un valor con un nombre para poder reutilizarlo después. Los textos van entre comillas (tipo <code>str</code>), los números enteros no (tipo <code>int</code>).</p>
+      <p>Un f-string (<code>f"..."</code>) te deja meter variables directo dentro de un texto usando llaves <code>{ }</code>.</p>
+    `,
+    example: `ciudad = "Monterrey"\npoblacion = 5341171\nprint(f"{ciudad} tiene {poblacion} habitantes")\nprint(type(ciudad))\nprint(type(poblacion))\n`,
+    practiceBody: `<p>Crea <code>nombre</code> (tu nombre, como texto) y <code>edad</code> (un número entero). Luego imprímelos con un f-string: <code>f"Me llamo {nombre} y tengo {edad} años"</code></p>`,
+    starter: `nombre = ""\nedad = 0\n# Completa las variables y agrega el print con f-string\n`,
+    check: `
+def check(ns, output):
+    nombre = ns.get("nombre")
+    edad = ns.get("edad")
+    if not isinstance(nombre, str) or nombre.strip() == "":
+        return (False, "La variable nombre debe ser un texto no vacío.")
+    if not isinstance(edad, int):
+        return (False, "La variable edad debe ser un número entero.")
+    if nombre.lower() not in output.lower() or str(edad) not in output:
+        return (False, "No veo tu nombre y tu edad en lo que imprimiste.")
+    return (True, "Bien. Las variables guardan datos que puedes reutilizar cuando quieras.")
+`
+  },
+  {
+    title: "3. Operadores aritméticos",
+    body: `
+      <p>Python calcula con <code>+ - * /</code> igual que una calculadora. También existe <code>**</code> para potencias y <code>//</code> para división entera.</p>
+      <p>El orden de operaciones es el normal de matemáticas: multiplicación y división antes que suma y resta.</p>
+    `,
+    example: `precio = 150\ncantidad = 3\ntotal = precio * cantidad\nprint(f"Total a pagar: {total}")\nprint(f"Con IVA: {total * 1.16}")\n`,
+    practiceBody: `<p>Ya tienes <code>base = 8</code> y <code>altura = 5</code>. Calcula el área de un triángulo (<code>base * altura / 2</code>), guárdala en <code>area</code> e imprímela.</p>`,
+    starter: `base = 8\naltura = 5\n# calcula el área del triángulo y guárdala en area\n`,
+    check: `
+def check(ns, output):
+    area = ns.get("area")
+    if area is None:
+        return (False, "Falta la variable area.")
+    esperado = 8 * 5 / 2
+    if abs(area - esperado) > 0.01:
+        return (False, f"El área debería ser {esperado}, revisa la fórmula base*altura/2.")
+    if not output.strip():
+        return (False, "Imprime el valor de area con print(area).")
+    return (True, "Exacto. base*altura/2 es el área de un triángulo.")
+`
+  },
+  {
+    title: "4. Cadenas de texto",
+    body: `
+      <p>Los textos (<code>str</code>) tienen métodos útiles integrados: <code>.upper()</code> pasa a mayúsculas, <code>.lower()</code> a minúsculas, y <code>len()</code> te dice cuántos caracteres tiene.</p>
+      <p>Estos métodos no modifican el texto original, regresan uno nuevo.</p>
+    `,
+    example: `saludo = "hola equipo"\nprint(saludo.upper())\nprint(len(saludo))\nprint(saludo.replace("hola", "buenas"))\n`,
+    practiceBody: `<p>Ya tienes <code>frase</code>. Crea <code>mayus</code> con <code>frase.upper()</code>, luego imprime primero la longitud de <code>frase</code> y después <code>mayus</code>.</p>`,
+    starter: `frase = "aprender python es divertido"\n# 1. crea mayus con frase.upper()\n# 2. imprime len(frase) y luego mayus\n`,
+    check: `
+def check(ns, output):
+    mayus = ns.get("mayus")
+    if mayus != "APRENDER PYTHON ES DIVERTIDO":
+        return (False, "mayus debe ser frase.upper().")
+    if "29" not in output:
+        return (False, "Imprime la longitud de frase con len(frase).")
+    if "APRENDER" not in output:
+        return (False, "Imprime también la variable mayus.")
+    return (True, "Bien. Las cadenas tienen métodos como upper() y funcionan con len().")
+`
+  },
+  {
+    title: "5. Condicionales",
+    body: `
+      <p>Con <code>if / elif / else</code> tu programa toma decisiones distintas según los datos que recibe. Solo se ejecuta el primer bloque cuya condición sea verdadera.</p>
+      <p>Se usan <code>== &gt; &lt; &gt;= &lt;=</code> para comparar valores.</p>
+    `,
+    example: `hora = 14\nif hora < 12:\n    print("Buenos días")\nelif hora < 19:\n    print("Buenas tardes")\nelse:\n    print("Buenas noches")\n`,
+    practiceBody: `<p>Ya tienes <code>temperatura = 28</code>. Imprime <code>"Hace calor"</code> si es mayor a 30, <code>"Clima agradable"</code> si está entre 15 y 30, o <code>"Hace frío"</code> si es menor a 15.</p>`,
+    starter: `temperatura = 28\n# tu if / elif / else aquí\n`,
+    check: `
+def check(ns, output):
+    t = ns.get("temperatura")
+    if t is None:
+        return (False, "No cambies el nombre de la variable temperatura.")
+    esperado = "Hace calor" if t > 30 else ("Clima agradable" if t >= 15 else "Hace frío")
+    if esperado.lower() not in output.lower():
+        return (False, f"Con temperatura={t}, debería imprimirse: {esperado}")
+    return (True, "Tu programa ahora decide qué hacer según los datos. Así se ve la lógica condicional.")
+`
+  },
+  {
+    title: "6. Bucles",
+    body: `
+      <p>Un bucle <code>for</code> repite código sin que tengas que copiarlo varias veces. <code>range(1, 6)</code> genera los números del 1 al 5 (el último número no se incluye).</p>
+      <p>También existe <code>while</code>, que repite mientras una condición sea verdadera.</p>
+    `,
+    example: `for numero in range(1, 6):\n    print(numero)\n\nsuma = 0\nfor numero in range(1, 6):\n    suma = suma + numero\nprint(f"Suma total: {suma}")\n`,
+    practiceBody: `<p>Usa un <code>for</code> para sumar los números del 1 al 10 en la variable <code>total</code>, luego imprímelo.</p>`,
+    starter: `total = 0\n# usa un for con range() para sumar 1 a 10 en total\n`,
+    check: `
+def check(ns, output):
+    total = ns.get("total")
+    if total != 55:
+        return (False, "El total debería ser 55 (suma de 1 a 10). Revisa tu rango.")
+    if "55" not in output:
+        return (False, "Imprime el valor de total.")
+    return (True, "Los bucles hacen el trabajo repetitivo por ti. 55 es correcto.")
+`
+  },
+  {
+    title: "7. Listas",
+    body: `
+      <p>Una lista guarda varios valores en orden, dentro de corchetes <code>[ ]</code>. Puedes acceder a un elemento por su posición (empezando en 0), agregar con <code>.append(x)</code>, y saber cuántos hay con <code>len()</code>.</p>
+    `,
+    example: `numeros = [3, 1, 4, 1, 5]\nnumeros.append(9)\nprint(numeros)\nprint(f"El primero es {numeros[0]}")\nprint(f"En total hay {len(numeros)}")\n`,
+    practiceBody: `<p>Ya tienes <code>frutas</code>. Agrega <code>"mango"</code> con <code>append</code>, luego imprime cuántas frutas hay en total con <code>len(frutas)</code>.</p>`,
+    starter: `frutas = ["manzana", "pera", "uva"]\n# agrega "mango" y luego imprime la cantidad total\n`,
+    check: `
+def check(ns, output):
+    frutas = ns.get("frutas")
+    if frutas is None or "mango" not in frutas:
+        return (False, "Usa frutas.append('mango') para agregarla.")
+    if "4" not in output:
+        return (False, "Imprime len(frutas): deberían ser 4 frutas.")
+    return (True, "Las listas crecen con append(). Ya tienes 4 frutas.")
+`
+  },
+  {
+    title: "8. Funciones",
+    body: `
+      <p>Una función empaqueta código para reutilizarlo sin volver a escribirlo. Recibe datos entre paréntesis (parámetros) y puede devolver un resultado con <code>return</code>.</p>
+      <p>Una vez definida, la llamas usando su nombre seguido de paréntesis con los valores que necesita.</p>
+    `,
+    example: `def doble(x):\n    return x * 2\n\nprint(doble(4))\nprint(doble(10))\n`,
+    practiceBody: `<p>Completa <code>es_par(numero)</code> para que devuelva <code>True</code> si es par y <code>False</code> si no. Luego llama la función con 7 y con 10, e imprime ambos resultados.</p>`,
+    starter: `def es_par(numero):\n    # escribe tu código aquí\n    pass\n\n# llama la función para 7 y para 10, e imprime los resultados\n`,
+    check: `
+def check(ns, output):
+    fn = ns.get("es_par")
+    if not callable(fn):
+        return (False, "Define la función es_par(numero).")
+    try:
+        if fn(7) != False or fn(10) != True:
+            return (False, "Revisa tu lógica: 7 no es par, 10 sí lo es.")
+    except Exception as e:
+        return (False, f"Tu función tiene un error: {e}")
+    o = output.lower()
+    if "false" not in o and "true" not in o:
+        return (False, "Imprime los resultados de llamar a es_par(7) y es_par(10).")
+    return (True, "Felicidades. Ya escribiste y usaste tu propia función.")
+`
+  }
+];
+
+let current = 0;
+const completed = new Set();
+let pyodide = null;
+
+const stepperEl = document.getElementById('stepper');
+const titleEl = document.getElementById('lessonTitle');
+const bodyEl = document.getElementById('lessonBody');
+const practiceBodyEl = document.getElementById('practiceBody');
+const exampleEditorEl = document.getElementById('exampleEditor');
+const exampleRunBtn = document.getElementById('exampleRunBtn');
+const exampleConsoleEl = document.getElementById('exampleConsole');
+const editorEl = document.getElementById('editor');
+const runBtn = document.getElementById('runBtn');
+const resetBtn = document.getElementById('resetBtn');
+const consoleEl = document.getElementById('consoleOut');
+const feedbackWrap = document.getElementById('feedbackWrap');
+const nextWrap = document.getElementById('nextWrap');
+
+function renderStepper(){
+  stepperEl.innerHTML = '';
+  LESSONS.forEach((l, i) => {
+    const b = document.createElement('div');
+    b.className = 'step' + (i === current ? ' active' : '') + (completed.has(i) ? ' done' : '');
+    b.textContent = completed.has(i) ? '✓' : (i + 1);
+    b.onclick = () => loadLesson(i);
+    stepperEl.appendChild(b);
+  });
+}
+
+function loadLesson(i){
+  current = i;
+  const lesson = LESSONS[i];
+  titleEl.textContent = lesson.title;
+  bodyEl.innerHTML = lesson.body;
+  practiceBodyEl.innerHTML = lesson.practiceBody;
+  exampleEditorEl.value = lesson.example;
+  exampleConsoleEl.textContent = 'La salida aparecerá aquí.';
+  editorEl.value = lesson.starter;
+  consoleEl.textContent = 'La salida de tu código aparecerá aquí.';
+  feedbackWrap.innerHTML = '';
+  nextWrap.innerHTML = '';
+  renderStepper();
+}
+
+resetBtn.onclick = () => loadLesson(current);
+
+function setupTabKey(el){
+  el.addEventListener('keydown', (e) => {
+    if(e.key === 'Tab'){
+      e.preventDefault();
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      el.value = el.value.slice(0, start) + '    ' + el.value.slice(end);
+      el.selectionStart = el.selectionEnd = start + 4;
+    }
+  });
+}
+setupTabKey(editorEl);
+setupTabKey(exampleEditorEl);
+
+async function runPlainPython(code){
+  pyodide.globals.set('__code__', code);
+  const resultJson = await pyodide.runPythonAsync(`
+import io, contextlib, json
+buf = io.StringIO()
+__error__ = None
+try:
+    with contextlib.redirect_stdout(buf):
+        exec(__code__, {})
+except Exception as e:
+    __error__ = str(e)
+json.dumps({'output': buf.getvalue(), 'error': __error__})
+`);
+  return JSON.parse(resultJson);
+}
+
+async function setup(){
+  pyodide = await loadPyodide({ indexURL: "https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.4/" });
+  runBtn.disabled = false;
+  runBtn.textContent = 'Ejecutar mi ejercicio';
+  exampleRunBtn.disabled = false;
+  exampleRunBtn.textContent = 'Ejecutar ejemplo';
+  loadLesson(0);
+}
+
+exampleRunBtn.onclick = async () => {
+  exampleRunBtn.disabled = true;
+  exampleRunBtn.textContent = 'Ejecutando…';
+  const data = await runPlainPython(exampleEditorEl.value);
+  exampleConsoleEl.textContent = data.error
+    ? 'Error: ' + data.error
+    : (data.output && data.output.trim() ? data.output : '(sin salida impresa)');
+  exampleRunBtn.disabled = false;
+  exampleRunBtn.textContent = 'Ejecutar ejemplo';
+};
+
+runBtn.onclick = async () => {
+  runBtn.disabled = true;
+  runBtn.textContent = 'Ejecutando…';
+  feedbackWrap.innerHTML = '';
+  nextWrap.innerHTML = '';
+
+  const lesson = LESSONS[current];
+  pyodide.globals.set('__user_code__', editorEl.value);
+  pyodide.globals.set('__check_code__', lesson.check);
+
+  try {
+    const resultJson = await pyodide.runPythonAsync(`
+import io, contextlib, json
+
+ns = {}
+__error__ = None
+__output__ = ''
+try:
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        exec(__user_code__, ns)
+    __output__ = buf.getvalue()
+except Exception as e:
+    __error__ = str(e)
+
+__passed__ = False
+__message__ = ''
+if __error__ is None:
+    try:
+        check_ns = {}
+        exec(__check_code__, check_ns)
+        __passed__, __message__ = check_ns['check'](ns, __output__)
+    except Exception as e:
+        __message__ = 'Error al validar tu respuesta: ' + str(e)
+else:
+    __message__ = 'Tu código tiene un error: ' + __error__
+
+json.dumps({'output': __output__, 'error': __error__, 'passed': bool(__passed__), 'message': __message__})
+`);
+    const data = JSON.parse(resultJson);
+    consoleEl.textContent = data.output && data.output.trim() ? data.output : '(sin salida impresa)';
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (data.passed ? 'pass' : 'fail');
+    fb.textContent = data.message;
+    feedbackWrap.appendChild(fb);
+
+    if (data.passed){
+      completed.add(current);
+      renderStepper();
+      if (current < LESSONS.length - 1){
+        const nb = document.createElement('button');
+        nb.textContent = 'Siguiente lección →';
+        nb.onclick = () => loadLesson(current + 1);
+        nextWrap.appendChild(nb);
+      } else {
+        const doneMsg = document.createElement('div');
+        doneMsg.className = 'feedback pass';
+        doneMsg.style.marginTop = '8px';
+        doneMsg.textContent = '¡Completaste las 8 lecciones! Ya conoces las bases de Python.';
+        feedbackWrap.appendChild(doneMsg);
+      }
+    }
+  } catch (e){
+    consoleEl.textContent = 'Error inesperado: ' + e;
+  }
+
+  runBtn.disabled = false;
+  runBtn.textContent = 'Ejecutar mi ejercicio';
+};
+
+setup();
+</script>
+</body>
+</html>
